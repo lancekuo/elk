@@ -1,0 +1,85 @@
+version: "3.1"
+
+networks:
+    logging:
+
+services:
+    logstash:
+        build: logstash/
+        image: lancekuo/logstash:5.5
+        ports:
+            - 5000:5000
+        networks:
+            - logging
+        environment:
+            DEBUG:                  "${LOGSTASH_DEBUG:-false}"
+            LOGSPOUT:               ignore
+            ELASTICSEARCH_USER:     ${ELASTICSEARCH_LOGS_USER}
+            ELASTICSEARCH_PASSWORD: ${ELASTICSEARCH_LOGS_PASSWORD}
+            ELASTICSEARCH_SSL:      ${ELASTICSEARCH_LOGS_SSL}
+            ELASTICSEARCH_ADDR:     ${ELASTICSEARCH_LOGS_ADDR:-elasticsearch}
+            ELASTICSEARCH_PORT:     ${ELASTICSEARCH_LOGS_PORT:-9200}
+        deploy:
+            mode: replicated
+            replicas: 1
+            resources:
+                limits:
+                    cpus: '0.25'
+                    memory: 800M
+                reservations:
+                    cpus: '0.25'
+                    memory: 400M
+
+    elasticsearch:
+        build: elasticsearch/
+        image: lancekuo/elasticsearch:5.5
+        ports:
+            - 9200:9200
+        networks:
+            - logging
+        environment:
+            - LOGSPOUT=ignore
+            - cluster.name=docker-cluster
+            - bootstrap.memory_lock=true
+            - xpack.security.enabled=false
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+            nofile:
+                soft: 65536
+                hard: 65536
+            cap_add:
+                - IPC_LOCK
+        deploy:
+            mode: replicated
+            replicas: 1
+            resources:
+                limits:
+                    cpus: '2'
+                    memory: 640M
+                reservations:
+                    cpus: '0.5'
+                    memory: 512M
+
+    kibana:
+        build: kibana/
+        image: lancekuo/kibana:5.5
+        networks:
+            - logging
+        ports:
+            - "5601:5601"
+        environment:
+            - LOGSPOUT=ignore
+            - ELASTICSEARCH_URL=http://elasticsearch:9200
+        deploy:
+            mode: replicated
+            replicas: 1
+            resources:
+                limits:
+                    cpus: '0.25'
+                    memory: 384M
+                reservations:
+                    cpus: '0.25'
+                    memory: 256M
