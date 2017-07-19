@@ -1,14 +1,16 @@
-version: "3.1"
+version: "3.2"
 
 networks:
     logging:
+        driver: overlay
+        attachable: true
 
 services:
     logstash:
         build: logstash/
         image: lancekuo/logstash:5.5
         ports:
-            - 5000:5000
+            - 5000:5000/udp
         networks:
             - logging
         environment:
