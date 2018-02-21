@@ -1,5 +1,5 @@
 # https://github.com/elastic/elasticsearch-docker
-FROM docker.elastic.co/elasticsearch/elasticsearch:5.5.0
+FROM docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 
 COPY config/elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
 # Add your elasticsearch plugins setup here

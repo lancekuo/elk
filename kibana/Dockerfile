@@ -1,5 +1,5 @@
 # https://github.com/elastic/kibana-docker
-FROM docker.elastic.co/kibana/kibana:5.5.0
+FROM docker.elastic.co/kibana/kibana:6.2.2
 
 COPY config/ /usr/share/kibana/config
 # Add your kibana plugins setup here
