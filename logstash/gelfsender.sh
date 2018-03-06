@@ -1,7 +1,7 @@
 # This script can be used to raise a graylog2/gelf message
 # gzip it and send it to a graylog server using netcat (nc)
 
-hostname='10.10.101.10'
+hostname='gelftester'
 short_message='test message short version'
 full_message='longer test message. dont\n worry be happy'
 level=1
@@ -48,7 +48,7 @@ echo
 
 echo Send
 echo ----
-echo  "${gelf_message}"| gzip -c -f - | nc -w 1 -u 0.0.0.0 5000
+echo  "${gelf_message}"| gzip -c -f - | nc -w 1 -u 0.0.0.0 4790
 echo ==============
 echo
 echo

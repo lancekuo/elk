@@ -10,7 +10,7 @@ services:
         build: logstash/
         image: lancekuo/logstash:6.2.2
         ports:
-            - 5000:5000/udp
+            - 4790:4790/udp
         networks:
             - logging
         environment:
