@@ -42,9 +42,14 @@ services:
         environment:
             - LOGSPOUT=ignore
             - cluster.name=docker-cluster
-            - bootstrap.memory_lock=true
+            - http.host=0.0.0.0
+            - network.host=localhost
+            - path.data=/opt/elasticsearch
+#            - bootstrap.memory_lock=true # TODO find the solution to this
             - xpack.security.enabled=false
-            - 'ES_JAVA_OPTS=-Xms512m -Xmx2048m'
+            - 'ES_JAVA_OPTS=-Xms1g -Xmx2g'
+        volumes:
+            - "/opt/elasticsearch:/opt/elasticsearch"
         ulimits:
             memlock:
                 soft: -1
@@ -63,14 +68,16 @@ services:
             resources:
                 limits:
                     cpus: '1'
-                    memory: 2048M
+                    memory: 2G
                 reservations:
                     cpus: '0.5'
-                    memory: 512M
+                    memory: 2G
 
     kibana:
         build: kibana/
         image: lancekuo/kibana:6.2.3
+        networks:
+            - logging
         ports:
             - "5601:5601"
         environment:
