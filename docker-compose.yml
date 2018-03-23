@@ -8,7 +8,7 @@ networks:
 services:
     logstash:
         build: logstash/
-        image: lancekuo/logstash:6.2.2
+        image: lancekuo/logstash:6.2.3
         ports:
             - 4790:4790/udp
         networks:
@@ -34,7 +34,7 @@ services:
 
     elasticsearch:
         build: elasticsearch/
-        image: lancekuo/elasticsearch:6.2.2
+        image: lancekuo/elasticsearch:6.2.3
         ports:
             - 9200:9200
         networks:
@@ -70,9 +70,7 @@ services:
 
     kibana:
         build: kibana/
-        image: lancekuo/kibana:6.2.2
-        networks:
-            - logging
+        image: lancekuo/kibana:6.2.3
         ports:
             - "5601:5601"
         environment:
