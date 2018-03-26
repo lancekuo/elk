@@ -15,7 +15,7 @@ services:
         networks:
             - logging
         environment:
-            - LOG_LEVEL=debug
+            - LOG_LEVEL=fatal # fatal error info debug trace
             - ELASTICSEARCH_USER=${ELASTICSEARCH_LOGS_USER}
             - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_LOGS_PASSWORD}
             - ELASTICSEARCH_SSL=${ELASTICSEARCH_LOGS_SSL}
@@ -40,7 +40,6 @@ services:
         networks:
             - logging
         environment:
-            - LOG_LEVEL=warn
             - cluster.name=docker-cluster
             - http.host=0.0.0.0
             - network.host=localhost
@@ -81,7 +80,7 @@ services:
         ports:
             - "5601:5601"
         environment:
-            - LOG_LEVEL=error
+            - LOGGING_QUIET=true
             - ELASTICSEARCH_URL=http://elasticsearch:9200
         deploy:
             placement:
