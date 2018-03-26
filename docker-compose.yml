@@ -11,6 +11,7 @@ services:
         image: lancekuo/logstash:6.2.3
         ports:
             - 4790:4790/udp
+            - 4790:4790
         networks:
             - logging
         environment:

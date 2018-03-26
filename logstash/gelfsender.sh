@@ -46,9 +46,15 @@ echo
 echo
 
 
-echo Send
+echo Send UDP
 echo ----
 echo  "${gelf_message}"| gzip -c -f - | nc -w 1 -u 0.0.0.0 4790
+echo ==============
+echo
+echo
+echo Send TCP
+echo ----
+echo  "${gelf_message}"| nc -w 1 0.0.0.0 4790
 echo ==============
 echo
 echo
