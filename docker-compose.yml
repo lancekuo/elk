@@ -1,9 +1,9 @@
-version: "3.2"
+version: "3.5"
 
 networks:
-    logging:
-        driver: overlay
-        attachable: true
+    log-network:
+        external: true
+        name: log-network
 
 services:
     logstash:
@@ -13,7 +13,7 @@ services:
             - 4790:4790/udp
             - 4790:4790
         networks:
-            - logging
+            - log-network
         environment:
             - LOG_LEVEL=fatal # fatal error info debug trace
             - ELASTICSEARCH_USER=${ELASTICSEARCH_LOGS_USER}
@@ -38,7 +38,7 @@ services:
         ports:
             - 9200:9200
         networks:
-            - logging
+            - log-network
         environment:
             - cluster.name=docker-cluster
             - http.host=0.0.0.0
@@ -76,7 +76,7 @@ services:
         build: kibana/
         image: lancekuo/kibana:6.2.3
         networks:
-            - logging
+            - log-network
         ports:
             - "5601:5601"
         environment:
