@@ -1,6 +1,9 @@
 version: "3.5"
 
 networks:
+    app-network:
+        external: true
+        name: app-network
     log-network:
         external: true
         name: log-network
@@ -14,6 +17,7 @@ services:
             - 4790:4790
         networks:
             - log-network
+            - app-network
         environment:
             - LOG_LEVEL=fatal # fatal error info debug trace
             - ELASTICSEARCH_USER=${ELASTICSEARCH_LOGS_USER}
