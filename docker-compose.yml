@@ -19,7 +19,7 @@ services:
             - log-network
             - app-network
         environment:
-            - LOG_LEVEL=fatal # fatal error info debug trace
+            - LOG_LEVEL=warn # fatal error warn info debug trace
             - ELASTICSEARCH_USER=${ELASTICSEARCH_LOGS_USER}
             - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_LOGS_PASSWORD}
             - ELASTICSEARCH_SSL=${ELASTICSEARCH_LOGS_SSL}
