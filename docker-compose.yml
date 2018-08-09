@@ -35,33 +35,27 @@ services:
                 reservations:
                     cpus: '0.5'
                     memory: 300M
-
     elasticsearch:
+#   sudo sysctl -w vm.max_map_count=262144 # For Linux
         build: elasticsearch/
-        image: lancekuo/elasticsearch:6.2.3
-        ports:
-            - 9200:9200
+        image: lancekuo/elasticsearch:6.3.2
         networks:
             - log-network
         environment:
-            - cluster.name=docker-cluster
-            - http.host=0.0.0.0
-            - network.host=localhost
-            - path.data=/opt/elasticsearch
-#            - bootstrap.memory_lock=true # TODO find the solution to this
-            - xpack.security.enabled=false
-            - 'ES_JAVA_OPTS=-Xms1g -Xmx2g'
-        volumes:
-            - "/opt/elasticsearch:/opt/elasticsearch"
+            - bootstrap.memory_lock=true
+            - cluster.name=${CLUSTER_NAME:-development}
+            - discovery.type=zen
+            - discovery.zen.minimum_master_nodes=2
+            - discovery.zen.ping.unicast.hosts=elasticsearch
+            - network.host=_eth0_
+            - 'ES_JAVA_OPTS=-Xms3g -Xmx3g'
+#            - path.data=/data/$${HOSTNAME}
+#        volumes:
+#            - data:/data
         ulimits:
             memlock:
                 soft: -1
                 hard: -1
-            nofile:
-                soft: 65536
-                hard: 65536
-        cap_add:
-            - IPC_LOCK
         deploy:
             placement:
                 constraints:
@@ -71,10 +65,10 @@ services:
             resources:
                 limits:
                     cpus: '1'
-                    memory: 2G
+                    memory: 3G
                 reservations:
                     cpus: '0.5'
-                    memory: 2G
+                    memory: 3G
 
     kibana:
         build: kibana/
