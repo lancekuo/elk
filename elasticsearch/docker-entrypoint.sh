@@ -55,6 +55,13 @@ do
         if [[ ! -z $envvar_value ]]; then
           es_opt="-E${envvar_key}=${envvar_value}"
           es_opts+=("${es_opt}")
+
+          if [[ "$envvar_key" = 'path.data' ]]; then
+            echo 'Found "path.data" variable, creating the folder and setup read/write permission...'
+            eval mkdir -p $envvar_value
+            eval chown 1000:0 $envvar_value
+            eval chmod 0775 $envvar_value
+          fi
         fi
     fi
 done < <(env)
