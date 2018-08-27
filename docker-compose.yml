@@ -11,7 +11,7 @@ networks:
 services:
     logstash:
         build: logstash/
-        image: lancekuo/logstash:6.3.2-1
+        image: lancekuo/logstash:6.3.2-2
         ports:
             - 4790:4790/udp
             - 4790:4790

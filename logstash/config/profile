@@ -1,0 +1,13 @@
+if [ -z $ES_HOST ];then
+    aws sts get-caller-identity
+    if [ $? -eq 0 ];then
+        ES_HOST=$(aws ec2 describe-tags --filter "Name=resource-id,Values=$(curl -m 1 -s http://169.254.169.254/latest/meta-data/instance-id)" --region ca-central-1|jq -r '.Tags[]|select(.Key=="ES_LOGGING").Value')
+        if [ ! -z $ES_HOST ];then
+            export ES_HOST
+        else
+            echo "Cannot get info from tags, fallback to default ES_HOST."
+        fi
+    fi
+else
+    echo "Found ES_HOST=$ES_HOST set up in environment variable."
+fi
