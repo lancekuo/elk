@@ -2,16 +2,14 @@ version: "3.5"
 
 networks:
     app-network:
-        external: true
         name: app-network
     log-network:
-        external: true
         name: log-network
 
 services:
     logstash:
         build: logstash/
-        image: lancekuo/logstash:6.3.2-2
+        image: lancekuo/logstash:6.3.2-3
         ports:
             - 4790:4790/udp
             - 4790:4790
@@ -42,13 +40,14 @@ services:
         networks:
             - log-network
         environment:
-            - bootstrap.memory_lock=true
+# https://github.com/moby/moby/pull/37701
+#            - bootstrap.memory_lock=true
             - cluster.name=${CLUSTER_NAME:-development}
             - discovery.type=zen
             - discovery.zen.minimum_master_nodes=2
             - discovery.zen.ping.unicast.hosts=elasticsearch
             - network.host=_eth0_
-            - 'ES_JAVA_OPTS=-Xms3g -Xmx3g'
+            - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
 #            - path.data=/data/$${HOSTNAME}
 #        volumes:
 #            - data:/data
@@ -61,14 +60,14 @@ services:
                 constraints:
                     - node.labels.type == storage
             mode: replicated
-            replicas: 1
+            replicas: 2
             resources:
                 limits:
                     cpus: '1'
-                    memory: 3G
+                    memory: 1G
                 reservations:
                     cpus: '0.5'
-                    memory: 3G
+                    memory: 1G
 
     kibana:
         build: kibana/
@@ -96,7 +95,7 @@ services:
             resources:
                 limits:
                     cpus: '1'
-                    memory: 2048M
+                    memory: 1024M
                 reservations:
                     cpus: '0.5'
                     memory: 512M
