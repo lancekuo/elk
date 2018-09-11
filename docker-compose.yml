@@ -9,7 +9,7 @@ networks:
 services:
     logstash:
         build: logstash/
-        image: lancekuo/logstash:6.3.2-3
+        image: lancekuo/logstash:6.4.0
         ports:
             - 4790:4790/udp
             - 4790:4790
@@ -36,18 +36,24 @@ services:
     elasticsearch:
 #   sudo sysctl -w vm.max_map_count=262144 # For Linux
         build: elasticsearch/
-        image: lancekuo/elasticsearch:6.3.2
+        image: lancekuo/elasticsearch:6.4.0
         networks:
             - log-network
         environment:
 # https://github.com/moby/moby/pull/37701
 #            - bootstrap.memory_lock=true
-            - cluster.name=${CLUSTER_NAME:-development}
-            - discovery.type=zen
-            - discovery.zen.minimum_master_nodes=2
-            - discovery.zen.ping.unicast.hosts=elasticsearch
-            - network.host=_eth0_
+            - CLUSTER_NAME=${CLUSTER_NAME:-development}
+            - DISCOVERY_TYPE=zen
+            - DISCOVERY_ZEN_MINIMUM_MASTER_NODES=1
+            - DISCOVERY_ZEN_PING_UNICAST_HOSTS=elasticsearch
+            - NETWORK_HOST=_eth0_
             - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+            # - XPACK_GRAPH_ENABLED=false
+            # - XPACK_ML_ENABLED=false
+            # - XPACK_MONITORING_ENABLED=false
+            - XPACK_MONITORING_COLLECTION_ENABLED=true
+            # - XPACK_REPORTING_ENABLED=false
+            # - XPACK_SECURITY_ENABLED=false
 #            - path.data=/data/$${HOSTNAME}
 #        volumes:
 #            - data:/data
@@ -71,7 +77,7 @@ services:
 
     kibana:
         build: kibana/
-        image: lancekuo/kibana:6.3.2
+        image: lancekuo/kibana:6.4.0
         networks:
             - log-network
         ports:
@@ -81,11 +87,11 @@ services:
             - LOGGING_QUIET=true
             - SERVER_HOST=0.0.0.0
             - SERVER_NAME=${CLUSTER_NAME:-development}
-            - XPACK_GRAPH.ENABLED=false
-            - XPACK_ML_ENABLED=false
-            - XPACK_MONITORING_ENABLED=false
-            - XPACK_REPORTING_ENABLED=false
-            - XPACK_SECURITY_ENABLED=false
+            # - XPACK_GRAPH.ENABLED=false
+            # - XPACK_ML_ENABLED=false
+            # - XPACK_MONITORING_ENABLED=false
+            # - XPACK_REPORTING_ENABLED=false
+            # - XPACK_SECURITY_ENABLED=false
         deploy:
             placement:
                 constraints:

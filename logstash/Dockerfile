@@ -1,5 +1,5 @@
 # https://github.com/elastic/logstash-docker
-FROM docker.elastic.co/logstash/logstash:6.3.2
+FROM docker.elastic.co/logstash/logstash:6.4.0
 
 USER root
 RUN yum install epel-release -y && yum install jq -y && curl -s https://bootstrap.pypa.io/get-pip.py|python - && pip install awscli && yum clean all && rm -rf /var/cache/yum
