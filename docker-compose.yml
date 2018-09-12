@@ -23,6 +23,8 @@ services:
             - ELASTICSEARCH_SSL=${ELASTICSEARCH_LOGS_SSL}
             - ELASTICSEARCH_ADDR=${ELASTICSEARCH_LOGS_ADDR:-elasticsearch}
             - ELASTICSEARCH_PORT=${ELASTICSEARCH_LOGS_PORT:-9200}
+            - PATH_CONFIG=/usr/share/logstash/pipeline
+            - XPACK_MONITORING_ENABLED=true
         deploy:
             mode: replicated
             replicas: 1
@@ -48,12 +50,11 @@ services:
             - DISCOVERY_ZEN_PING_UNICAST_HOSTS=elasticsearch
             - NETWORK_HOST=_eth0_
             - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
-            # - XPACK_GRAPH_ENABLED=false
-            # - XPACK_ML_ENABLED=false
-            # - XPACK_MONITORING_ENABLED=false
+            - XPACK_ML_ENABLED=true
+            - XPACK_MONITORING_ENABLED=true
             - XPACK_MONITORING_COLLECTION_ENABLED=true
-            # - XPACK_REPORTING_ENABLED=false
-            # - XPACK_SECURITY_ENABLED=false
+            - XPACK_WATCHER_ENABLED=true
+            # - XPACK_SECURITY_ENABLED=true
 #            - path.data=/data/$${HOSTNAME}
 #        volumes:
 #            - data:/data
@@ -87,11 +88,12 @@ services:
             - LOGGING_QUIET=true
             - SERVER_HOST=0.0.0.0
             - SERVER_NAME=${CLUSTER_NAME:-development}
-            # - XPACK_GRAPH.ENABLED=false
-            # - XPACK_ML_ENABLED=false
-            # - XPACK_MONITORING_ENABLED=false
-            # - XPACK_REPORTING_ENABLED=false
-            # - XPACK_SECURITY_ENABLED=false
+            - XPACK_GRAPH.ENABLED=true
+            - XPACK_ML_ENABLED=true
+            - XPACK_MONITORING_ENABLED=true
+            - XPACK_MONITORING_KIBANA_COLLECTION_ENABLED=true
+            - XPACK_REPORTING_ENABLED=true
+            # - XPACK_SECURITY_ENABLED=true
         deploy:
             placement:
                 constraints:

@@ -6,7 +6,9 @@ RUN yum install epel-release -y && yum install jq -y && curl -s https://bootstra
 COPY config/profile /etc/profile.d/ES_HOST.sh
 RUN sed -i '1 a source /etc/profile.d/ES_HOST.sh' /usr/local/bin/docker-entrypoint
 
-USER logstash
+ENV PATH_CONFIG /usr/share/logstash/pipeline
 COPY pipeline/logstash.conf /usr/share/logstash/pipeline/logstash.conf
+RUN chown -R logstash:root /usr/share/logstash/pipeline
+USER logstash
 # Add your logstash plugins setup here
 # Example: RUN logstash-plugin install logstash-filter-json
