@@ -37,6 +37,7 @@ services:
                     memory: 300M
     elasticsearch:
 #   sudo sysctl -w vm.max_map_count=262144 # For Linux
+        hostname: 'elasticsearch-{{.Task.Slot}}'
         build: elasticsearch/
         image: lancekuo/elasticsearch:6.4.0
         networks:
@@ -44,11 +45,11 @@ services:
         environment:
 # https://github.com/moby/moby/pull/37701
 #            - bootstrap.memory_lock=true
-            - CLUSTER_NAME=${CLUSTER_NAME:-development}
-            - DISCOVERY_TYPE=zen
-            - DISCOVERY_ZEN_MINIMUM_MASTER_NODES=1
-            - DISCOVERY_ZEN_PING_UNICAST_HOSTS=elasticsearch
-            - NETWORK_HOST=_eth0_
+            - cluster.name=${CLUSTER_NAME:-development}
+            - discovery.type=zen
+            - discovery.zen.minimum_master_nodes=2
+            - discovery.zen.ping.unicast.hosts=tasks.{{.Service.Name}}
+            - node.name=elasticsearch-{{.Task.Slot}}
             - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
             - XPACK_ML_ENABLED=true
             - XPACK_MONITORING_ENABLED=true
@@ -67,7 +68,7 @@ services:
                 constraints:
                     - node.labels.type == storage
             mode: replicated
-            replicas: 2
+            replicas: 3
             resources:
                 limits:
                     cpus: '1'
