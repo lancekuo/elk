@@ -28,8 +28,7 @@ services:
             - PATH_CONFIG=/usr/share/logstash/pipeline
             - XPACK_MONITORING_ENABLED=true
         deploy:
-            mode: replicated
-            replicas: 1
+            mode: global
             resources:
                 limits:
                     cpus: '0.5'
@@ -91,7 +90,7 @@ services:
             - LOGGING_QUIET=true
             - SERVER_HOST=0.0.0.0
             - SERVER_NAME=${CLUSTER_NAME:-development}
-            - XPACK_GRAPH.ENABLED=true
+            - XPACK_GRAPH_ENABLED=true
             - XPACK_ML_ENABLED=true
             - XPACK_MONITORING_ENABLED=true
             - XPACK_MONITORING_KIBANA_COLLECTION_ENABLED=true
