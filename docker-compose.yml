@@ -1,10 +1,12 @@
 version: "3.5"
 
 networks:
-    app-network:
-        name: app-network
-    log-network:
-        name: log-network
+    app:
+        name: application
+        attachable: true
+    log:
+        name: logging
+        attachable: true
 
 services:
     logstash:
@@ -14,8 +16,8 @@ services:
             - 4790:4790/udp
             - 4790:4790
         networks:
-            - log-network
-            - app-network
+            - log
+            - app
         environment:
             - LOG_LEVEL=warn # fatal error warn info debug trace
             - ELASTICSEARCH_USER=${ELASTICSEARCH_LOGS_USER}
@@ -41,7 +43,7 @@ services:
         build: elasticsearch/
         image: lancekuo/elasticsearch:6.4.0
         networks:
-            - log-network
+            - log
         environment:
 # https://github.com/moby/moby/pull/37701
 #            - bootstrap.memory_lock=true
@@ -81,7 +83,7 @@ services:
         build: kibana/
         image: lancekuo/kibana:6.4.0
         networks:
-            - log-network
+            - log
         ports:
             - "5601:5601"
         environment:
