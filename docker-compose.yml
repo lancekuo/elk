@@ -51,7 +51,8 @@ services:
             - discovery.zen.minimum_master_nodes=2
             - discovery.zen.ping.unicast.hosts=tasks.{{.Service.Name}}
             - node.name=elasticsearch-{{.Task.Slot}}
-            - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+            - node.ml=true
+            - 'ES_JAVA_OPTS=-Xms768m -Xmx768m'
             - XPACK_ML_ENABLED=true
             - XPACK_MONITORING_ENABLED=true
             - XPACK_MONITORING_COLLECTION_ENABLED=true
@@ -73,10 +74,10 @@ services:
             resources:
                 limits:
                     cpus: '1'
-                    memory: 1G
+                    memory: 768m
                 reservations:
                     cpus: '0.5'
-                    memory: 1G
+                    memory: 768m
 
     kibana:
         build: kibana/
@@ -88,6 +89,7 @@ services:
         environment:
             - ELASTICSEARCH_URL=http://elasticsearch:9200
             - LOGGING_QUIET=true
+            - NODE_OPTIONS=--max-old-space-size=512
             - SERVER_HOST=0.0.0.0
             - SERVER_NAME=${CLUSTER_NAME:-development}
             - XPACK_GRAPH_ENABLED=true
@@ -105,7 +107,7 @@ services:
             resources:
                 limits:
                     cpus: '1'
-                    memory: 1024M
+                    memory: 512m
                 reservations:
                     cpus: '0.5'
-                    memory: 512M
+                    memory: 512m
