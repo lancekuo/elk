@@ -1,5 +1,10 @@
 version: "3.5"
 
+volumes:
+    data-local:
+        name: '{{.Service.Name}}-{{.Task.Slot}}'
+        driver: local
+
 networks:
     app:
         name: application
@@ -19,66 +24,97 @@ services:
             - log
             - app
         environment:
-            - LOG_LEVEL=warn # fatal error warn info debug trace
-            - ELASTICSEARCH_USER=${ELASTICSEARCH_LOGS_USER}
-            - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_LOGS_PASSWORD}
-            - ELASTICSEARCH_SSL=${ELASTICSEARCH_LOGS_SSL}
-            - ELASTICSEARCH_ADDR=${ELASTICSEARCH_LOGS_ADDR:-elasticsearch}
-            - ELASTICSEARCH_PORT=${ELASTICSEARCH_LOGS_PORT:-9200}
-            - PATH_CONFIG=/usr/share/logstash/pipeline
-            - XPACK_MONITORING_ENABLED=true
+            LOG_LEVEL: warn # fatal error warn info debug trace
+            ELASTICSEARCH_USER: ${ELASTICSEARCH_LOGS_USER}
+            ELASTICSEARCH_PASSWORD: ${ELASTICSEARCH_LOGS_PASSWORD}
+            ELASTICSEARCH_SSL: ${ELASTICSEARCH_LOGS_SSL}
+            ELASTICSEARCH_ADDR: ${ELASTICSEARCH_LOGS_ADDR:-elasticsearch}
+            ELASTICSEARCH_PORT: ${ELASTICSEARCH_LOGS_PORT:-9200}
+            PATH_CONFIG: /usr/share/logstash/pipeline
+            XPACK_MONITORING_ENABLED: "true"
         deploy:
             mode: global
             resources:
                 limits:
-                    cpus: '0.5'
-                    memory: 1024M
-                reservations:
-                    cpus: '0.5'
-                    memory: 300M
+                    memory: 768m
     elasticsearch:
-#   sudo sysctl -w vm.max_map_count=262144 # For Linux
         hostname: 'elasticsearch-{{.Task.Slot}}'
         build: elasticsearch/
         image: lancekuo/elasticsearch:6.4.0
         networks:
             - log
         environment:
-# https://github.com/moby/moby/pull/37701
-#            - bootstrap.memory_lock=true
-            - cluster.name=${CLUSTER_NAME:-development}
-            - discovery.type=zen
-            - discovery.zen.minimum_master_nodes=2
-            - discovery.zen.ping.unicast.hosts=tasks.{{.Service.Name}}
-            - node.name=elasticsearch-{{.Task.Slot}}
-            - node.ml=true
-            - 'ES_JAVA_OPTS=-Xms768m -Xmx768m'
-            - XPACK_ML_ENABLED=true
-            - XPACK_MONITORING_ENABLED=true
-            - XPACK_MONITORING_COLLECTION_ENABLED=true
-            - XPACK_WATCHER_ENABLED=true
-            # - XPACK_SECURITY_ENABLED=true
-#            - path.data=/data/$${HOSTNAME}
-#        volumes:
-#            - data:/data
+        # https://github.com/moby/moby/pull/37701
+        # sudo sysctl -w vm.max_map_count=262144 # For Linux
+            # bootstrap.memory_lock: "true"
+            cluster.name: ${CLUSTER_NAME:-lancekuo.com}
+            discovery.type: zen
+            discovery.zen.minimum_master_nodes: 2
+            discovery.zen.ping.unicast.hosts: tasks.{{.Service.Name}}
+            ES_JAVA_OPTS: -Xms512m -Xmx512m
+            node.name: elasticsearch-{{.Task.Slot}}
+            node.ml: "true"
+            node.master: "true"
+            node.data: "false"
+            node.ingest: "false"
+            search.remote.connect: "false"
+            xpack.ml.enabled: "true"
+            xpack.monitoring.enabled: "true"
+            xpack.monitoring.collection.enabled: "true"
+            xpack.watcher.enabled: "true"
+            # xpack.security.enabled: "true"
+        volumes:
+           - data-local:/usr/share/elasticsearch/data
         ulimits:
             memlock:
                 soft: -1
                 hard: -1
         deploy:
-            placement:
-                constraints:
-                    - node.labels.type == storage
+            endpoint_mode: dnsrr
             mode: replicated
             replicas: 3
             resources:
                 limits:
-                    cpus: '1'
-                    memory: 768m
-                reservations:
-                    cpus: '0.5'
-                    memory: 768m
+                    memory: 1g
 
+    elasticsearch-data:
+        hostname: 'elasticsearch-data-{{.Task.Slot}}'
+        build: elasticsearch/
+        image: lancekuo/elasticsearch:6.4.0
+        networks:
+            - log
+        environment:
+            # https://github.com/moby/moby/pull/37701
+            # sudo sysctl -w vm.max_map_count=262144 # For Linux
+            # bootstrap.memory_lock: "true"
+            cluster.name: ${CLUSTER_NAME:-lancekuo.com}
+            ES_JAVA_OPTS: -Xms512m -Xmx512m
+            discovery.type: zen
+            discovery.zen.ping.unicast.hosts: tasks.elasticsearch
+            node.ml: "false"
+            node.master: "false"
+            node.name: elasticsearch-data-{{.Task.Slot}}
+            node.data: "true"
+            node.ingest: "true"
+            search.remote.connect: "false"
+            xpack.ml.enabled: "true"
+            xpack.monitoring.enabled: "true"
+            xpack.monitoring.collection.enabled: "true"
+            xpack.watcher.enabled: "true"
+            # xpack.security.enabled="true"
+        volumes:
+           - data-local:/usr/share/elasticsearch/data
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        deploy:
+            endpoint_mode: dnsrr
+            mode: replicated
+            replicas: 1
+            resources:
+                limits:
+                    memory: 1g
     kibana:
         build: kibana/
         image: lancekuo/kibana:6.4.0
@@ -87,27 +123,21 @@ services:
         ports:
             - "5601:5601"
         environment:
-            - ELASTICSEARCH_URL=http://elasticsearch:9200
-            - LOGGING_QUIET=true
-            - NODE_OPTIONS=--max-old-space-size=512
-            - SERVER_HOST=0.0.0.0
-            - SERVER_NAME=${CLUSTER_NAME:-development}
-            - XPACK_GRAPH_ENABLED=true
-            - XPACK_ML_ENABLED=true
-            - XPACK_MONITORING_ENABLED=true
-            - XPACK_MONITORING_KIBANA_COLLECTION_ENABLED=true
-            - XPACK_REPORTING_ENABLED=true
-            # - XPACK_SECURITY_ENABLED=true
+            ELASTICSEARCH_URL: http://elasticsearch:9200
+            LOGGING_QUIET: "true"
+            NODE_OPTIONS: "--max-old-space-size=512"
+            SERVER_HOST: 0.0.0.0
+            SERVER_NAME: ${CLUSTER_NAME:-lancekuo.com}
+            XPACK_GRAPH_ENABLED: "true"
+            XPACK_ML_ENABLED: "true"
+            XPACK_MONITORING_ENABLED: "true"
+            XPACK_MONITORING_KIBANA_COLLECTION_ENABLED: "true"
+            XPACK_REPORTING_ENABLED: "true"
+            # XPACK_SECURITY_ENABLED: "true"
         deploy:
-            placement:
-                constraints:
-                    - node.labels.type == internal
             mode: replicated
             replicas: 1
             resources:
                 limits:
                     cpus: '1'
-                    memory: 512m
-                reservations:
-                    cpus: '0.5'
                     memory: 512m
