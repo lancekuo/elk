@@ -1,18 +1,5 @@
 version: "3.5"
 
-volumes:
-    data-local:
-        name: '{{.Service.Name}}-{{.Task.Slot}}'
-        driver: local
-
-networks:
-    app:
-        name: application
-        attachable: true
-    log:
-        name: logging
-        attachable: true
-
 services:
     logstash:
         build: logstash/
@@ -141,3 +128,16 @@ services:
                 limits:
                     cpus: '1'
                     memory: 512m
+
+volumes:
+    data-local:
+        name: '{{.Service.Name}}-{{.Task.Slot}}'
+        driver: local
+
+networks:
+    app:
+        name: application
+        attachable: true
+    log:
+        name: logging
+        attachable: true
