@@ -4,6 +4,11 @@ services:
     logstash:
         build: logstash/
         image: lancekuo/logstash:6.4.0
+        healthcheck:
+            test: curl -s -XGET http://localhost:9600
+            interval: 30s
+            timeout: 30s
+            retries: 10
         ports:
             - 4790:4790/udp
             - 4790:4790
@@ -28,6 +33,11 @@ services:
         hostname: 'elasticsearch-{{.Task.Slot}}'
         build: elasticsearch/
         image: lancekuo/elasticsearch:6.4.0
+        healthcheck:
+            test: nc -z -w 1 localhost 9200
+            interval: 30s
+            timeout: 30s
+            retries: 3
         networks:
             - log
         environment:
@@ -68,6 +78,11 @@ services:
         hostname: 'elasticsearch-data-{{.Task.Slot}}'
         build: elasticsearch/
         image: lancekuo/elasticsearch:6.4.0
+        healthcheck:
+            test: nc -z -w 1 localhost 9200
+            interval: 30s
+            timeout: 30s
+            retries: 3
         networks:
             - log
         environment:
@@ -105,6 +120,11 @@ services:
     kibana:
         build: kibana/
         image: lancekuo/kibana:6.4.0
+        healthcheck:
+            test: curl -s -XGET http://localhost:5601
+            interval: 30s
+            timeout: 30s
+            retries: 3
         networks:
             - log
         ports:
