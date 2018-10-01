@@ -132,7 +132,7 @@ services:
         environment:
             ELASTICSEARCH_URL: http://elasticsearch:9200
             LOGGING_QUIET: "true"
-            NODE_OPTIONS: "--max-old-space-size=512"
+            NODE_OPTIONS: "--max-old-space-size=256"
             SERVER_HOST: 0.0.0.0
             SERVER_NAME: ${CLUSTER_NAME:-lancekuo.com}
             XPACK_GRAPH_ENABLED: "true"
@@ -146,7 +146,6 @@ services:
             replicas: 1
             resources:
                 limits:
-                    cpus: '1'
                     memory: 512m
 
 volumes:
