@@ -62,11 +62,16 @@ services:
             # xpack.security.enabled: "true"
         volumes:
            - data-local:/usr/share/elasticsearch/data
+           # - data-rexray-ebs:/usr/share/elasticsearch/data
         ulimits:
             memlock:
                 soft: -1
                 hard: -1
         deploy:
+            # placement:
+            #     constraints:
+            #         - node.labels.azs == 0
+            #         - node.role == manager
             endpoint_mode: dnsrr
             mode: replicated
             replicas: 3
@@ -106,11 +111,16 @@ services:
             # xpack.security.enabled="true"
         volumes:
            - data-local:/usr/share/elasticsearch/data
+           # - data-rexray-ebs:/usr/share/elasticsearch/data
         ulimits:
             memlock:
                 soft: -1
                 hard: -1
         deploy:
+            # placement:
+            #     constraints:
+            #         - node.labels.azs == 0
+            #         - node.role == manager
             endpoint_mode: dnsrr
             mode: replicated
             replicas: 1
