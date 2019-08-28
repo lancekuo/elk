@@ -7,6 +7,9 @@ COPY config/profile /etc/profile.d/ES_HOST.sh
 RUN sed -i '1 a source /etc/profile.d/ES_HOST.sh' /usr/local/bin/docker-entrypoint
 
 ENV PATH_CONFIG /usr/share/logstash/pipeline
+USER logstash
+RUN /usr/share/logstash/bin/logstash-plugin install logstash-input-s3
+COPY config/logstash.yml /usr/share/logstash/config/logstash.yml
 COPY pipeline/logstash.conf /usr/share/logstash/pipeline/logstash.conf
 RUN chown -R logstash:root /usr/share/logstash/pipeline
 USER logstash
